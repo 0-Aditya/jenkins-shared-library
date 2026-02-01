@@ -17,6 +17,18 @@ def call(Map config = [:]) {
                 }
             }
 
+            stage('Run Docker Container') {
+                steps {
+                    sh """
+                    docker rm -f demo-container || true
+                    docker run -d --name demo-container -p 8081:80 ${config.imageName}:${config.tag}
+                    sleep 5
+                    docker ps
+                    docker rm -f demo-container
+                    """
+                }
+            }
+
             stage('Push Docker Image') {
                 steps {
                     withCredentials([usernamePassword(
@@ -34,3 +46,4 @@ def call(Map config = [:]) {
         }
     }
 }
+
